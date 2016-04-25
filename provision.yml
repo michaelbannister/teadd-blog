@@ -12,15 +12,25 @@
     zone: europe-west1-b
   
   tasks:
-    - name: Launch instances
-      gce:
-        instance_names: ghost-app
-        machine_type: "{{ machine_type }}"
-        image: "{{ image }}"
+#    - name: Launch instances
+#      gce:
+#        instance_names: ghost-app
+#        machine_type: "{{ machine_type }}"
+#        image: "{{ image }}"
+#        zone: "{{ zone }}"
+#        service_account_email: "{{ service_account_email }}"
+#        pem_file: "{{ credentials_file }}"
+#        project_id: "{{ project_id }}"
+#      register: app_servers
+#    - debug:
+#        var: app_servers
+
+    - name: Define DNS zone for teadd.uk
+      gc_dns_zone:
+        domain: teadd.uk.
+        name: teadd-uk
+        ttl: 86400
+        description: teadd.uk
         service_account_email: "{{ service_account_email }}"
         pem_file: "{{ credentials_file }}"
         project_id: "{{ project_id }}"
-        zone: "{{ zone }}"
-      register: gce
-    - debug:
-        var: gce
