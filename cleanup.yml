@@ -1,5 +1,5 @@
 ---
-- name: Create compute instance(s)
+- name: Delete compute instance(s)
   hosts: localhost
   connection: local
   gather_facts: no
@@ -13,35 +13,22 @@
     zone: europe-west1-b
   
   tasks:
-  - name: Launch instances
+  - name: Delete instances
     gce:
       instance_names: ghost-app
-      machine_type: "{{ machine_type }}"
-      image: "{{ image }}"
+      state: deleted
       zone: "{{ zone }}"
       service_account_email: "{{ service_account_email }}"
       credentials_file: "{{ credentials_file }}"
       project_id: "{{ project_id }}"
     register: app_servers
-  - debug: var=app_servers
 
-  - name: Define DNS zone for teadd.uk
-    gcdns_zone:
-      zone: teadd.uk.
-      description: teadd.uk
-      credentials_file: "{{ credentials_file }}"
-      service_account_email: "{{ service_account_email }}"
-      project_id: "{{ project_id }}"
-    register: teadd_uk_zone
-  - debug: var=teadd_uk_zone verbosity=1
-    
-  - name: Define DNS 'A' record for blog2.teadd.uk
+  - name: Delete DNS 'A' record for blog2.teadd.uk
     gcdns_record:
+      state: absent
       zone: teadd.uk.
       type: A
-      value: "{{ app_servers.instance_data[0].public_ip }}"
       record: blog2.teadd.uk
-      ttl: 300
       credentials_file: "{{ credentials_file }}"
       service_account_email: "{{ service_account_email }}"
       project_id: "{{ project_id }}"
