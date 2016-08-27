@@ -1,0 +1,7 @@
+---
+- name: set up NodeSource repo
+  script: setup_node_4.x.sh creates=/etc/yum.repos.d/nodesource-el.repo
+    
+
+- name: install NodeJS
+  yum: name=nodejs state=installed

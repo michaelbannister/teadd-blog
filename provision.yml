@@ -1,5 +1,5 @@
 ---
-- name: Create compute instance(s)
+- name: Create ghost instance(s)
   hosts: localhost
   connection: local
   gather_facts: no
@@ -13,18 +13,27 @@
     zone: europe-west1-b
   
   tasks:
-  - name: Launch instances
+  - name: Launch instance(s)
     gce:
       instance_names: ghost-app
       machine_type: "{{ machine_type }}"
       image: "{{ image }}"
       zone: "{{ zone }}"
+      tags: ansible-managed
       service_account_email: "{{ service_account_email }}"
       credentials_file: "{{ credentials_file }}"
       project_id: "{{ project_id }}"
     register: app_servers
-  - debug: var=app_servers
-
+  - debug: var=app_servers verbosity=1
+  
+  - set_fact: gce_ghost="{{ app_servers.instance_data[0] }}"
+  
+  - name: Wait for SSH to be ready
+    wait_for:
+      host: "{{ gce_ghost.public_ip }}"
+      port: 22
+      timeout: 30
+  
   - name: Define DNS zone for teadd.uk
     gcdns_zone:
       zone: teadd.uk.
@@ -39,10 +48,23 @@
     gcdns_record:
       zone: teadd.uk.
       type: A
-      value: "{{ app_servers.instance_data[0].public_ip }}"
+      value: "{{ gce_ghost.public_ip }}"
       record: blog2.teadd.uk
       ttl: 300
       credentials_file: "{{ credentials_file }}"
       service_account_email: "{{ service_account_email }}"
       project_id: "{{ project_id }}"
       overwrite: true
+  
+  - name: Allow HTTP
+    gce_net:
+      name: default
+      fwname: mb-ghost-app-http
+      allowed: tcp:80
+      src_range: 80.229.171.237
+      target_tags: ansible-managed
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
+      

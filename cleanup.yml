@@ -33,3 +33,12 @@
       service_account_email: "{{ service_account_email }}"
       project_id: "{{ project_id }}"
       overwrite: true
+
+  - name: Delete firewall rules
+    gce_net:
+      state: absent
+      name: default
+      fwname: mb-ghost-app-http
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"

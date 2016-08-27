@@ -1,0 +1,10 @@
+---
+- name: Configure ghost instance(s)
+  hosts: tag_ansible-managed
+  connection: ssh
+  become: true
+  
+  roles:
+  - nodejs
+  - nginx
+  
