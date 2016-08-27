@@ -32,7 +32,7 @@
     wait_for:
       host: "{{ gce_ghost.public_ip }}"
       port: 22
-      timeout: 30
+      timeout: 60
   
   - name: Define DNS zone for teadd.uk
     gcdns_zone:
