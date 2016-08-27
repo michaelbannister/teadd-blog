@@ -60,7 +60,7 @@
     gce_net:
       name: default
       fwname: mb-ghost-app-http
-      allowed: tcp:80
+      allowed: tcp:80,443
       src_range: 80.229.171.237
       target_tags: ansible-managed
       service_account_email: "{{ service_account_email }}"
