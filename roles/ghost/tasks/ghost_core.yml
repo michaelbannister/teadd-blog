@@ -23,6 +23,11 @@
   become: true
   become_user: ghost
 
+- name: Create Ghost config.js file
+  template:
+    src: config.js.j2
+    dest: "{{ ghost_install_dir }}/config.js"
+
 - name: Create Ghost service definition
   template:
     dest: /etc/systemd/system/ghost.service

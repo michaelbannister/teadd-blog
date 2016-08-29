@@ -1,0 +1,24 @@
+// from https://github.com/TryGhost/Ghost/blob/0.9.0/config.example.js
+var path = require('path'),
+    config;
+
+config = {
+    production: {
+        url: 'http://{{ domain }}',
+        mail: {},
+        database: {
+            client: 'sqlite3',
+            connection: {
+                filename: path.join(__dirname, '/content/data/ghost.db')
+            },
+            debug: false
+        },
+
+        server: {
+            host: '127.0.0.1',
+            port: '2368'
+        }
+    }
+};
+
+module.exports = config;
