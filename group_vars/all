@@ -1,0 +1,4 @@
+service_account_email: teadd-provision@teadd-blog.iam.gserviceaccount.com
+credentials_file: teadd_provision.privatekey.json
+project_id: teadd-blog
+zone: europe-west1-b
