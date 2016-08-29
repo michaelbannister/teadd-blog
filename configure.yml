@@ -3,8 +3,9 @@
   hosts: tag_ansible-managed
   connection: ssh
   become: true
-  
+
   roles:
   - nodejs
   - nginx
-  
+  - { role: swap, device: /dev/disk/by-id/google-ghost-swap }
+  - ghost

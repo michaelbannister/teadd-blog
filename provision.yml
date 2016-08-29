@@ -21,15 +21,25 @@
       project_id: "{{ project_id }}"
     register: app_servers
   - debug: var=app_servers verbosity=1
-  
+
   - set_fact: gce_ghost="{{ app_servers.instance_data[0] }}"
-  
+
+  - name: Create swap disk
+    gce_pd:
+      name: ghost-swap
+      mode: READ_WRITE
+      instance_name: ghost-app
+      zone: "{{ zone }}"
+      service_account_email: "{{ service_account_email }}"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "{{ project_id }}"
+
   - name: Wait for SSH to be ready
     wait_for:
       host: "{{ gce_ghost.public_ip }}"
       port: 22
       timeout: 60
-  
+
   - name: Define DNS zone for teadd.uk
     gcdns_zone:
       zone: teadd.uk.
@@ -39,7 +49,7 @@
       project_id: "{{ project_id }}"
     register: teadd_uk_zone
   - debug: var=teadd_uk_zone verbosity=1
-    
+
   - name: Define DNS 'A' record for blog2.teadd.uk
     gcdns_record:
       zone: teadd.uk.
@@ -51,7 +61,7 @@
       service_account_email: "{{ service_account_email }}"
       project_id: "{{ project_id }}"
       overwrite: true
-  
+
   - name: Allow HTTP
     gce_net:
       name: default
@@ -62,5 +72,3 @@
       service_account_email: "{{ service_account_email }}"
       credentials_file: "{{ credentials_file }}"
       project_id: "{{ project_id }}"
-
-      

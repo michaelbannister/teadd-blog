@@ -1,0 +1,10 @@
+- name: "Enable Ghost"
+  service:
+    name: ghost
+    state: started
+    enabled: yes
+
+- name: "Restart Ghost"
+  service:
+    name: ghost
+    state: restarted

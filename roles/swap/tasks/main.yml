@@ -1,0 +1,18 @@
+- fail: msg="Variable '{{ item }}' is undefined"
+  when: "{{ item }} is undefined"
+  with_items:
+    - device
+
+- name: Check if a device is already defined as swap
+  command: blkid -l -t TYPE=swap -o device
+  register: blkid_result
+
+- command: mkswap {{ device }}
+  when: blkid_result.rc != 0
+
+- command: swapon {{ device }}
+- mount:
+    state: present
+    src: "{{ device }}"
+    name: none
+    fstype: swap
