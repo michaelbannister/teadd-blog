@@ -15,12 +15,12 @@
       project_id: "{{ project_id }}"
     register: app_servers
 
-  - name: Delete DNS 'A' record for blog2.teadd.uk
+  - name: Delete DNS 'A' record for {{ domain }}
     gcdns_record:
       state: absent
       zone: teadd.uk.
       type: A
-      record: blog2.teadd.uk
+      record: "{{ domain }}"
       credentials_file: "{{ credentials_file }}"
       service_account_email: "{{ service_account_email }}"
       project_id: "{{ project_id }}"

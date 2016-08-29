@@ -50,12 +50,12 @@
     register: teadd_uk_zone
   - debug: var=teadd_uk_zone verbosity=1
 
-  - name: Define DNS 'A' record for blog2.teadd.uk
+  - name: "Define DNS 'A' record for {{ domain }}"
     gcdns_record:
       zone: teadd.uk.
       type: A
       value: "{{ gce_ghost.public_ip }}"
-      record: blog2.teadd.uk
+      record: "{{ domain }}"
       ttl: 300
       credentials_file: "{{ credentials_file }}"
       service_account_email: "{{ service_account_email }}"
