@@ -1,0 +1,32 @@
+- name: Download Ghost
+  unarchive:
+    src: https://ghost.org/zip/ghost-{{ ghost_version }}.zip
+    remote_src: true
+    dest: "{{ ghost_install_dir }}"
+    owner: ghost
+    group: ghost
+    mode: 0755
+    creates: "{{ ghost_install_dir }}/index.js"
+
+- name: Install sqlite3 from source
+  command: npm install sqlite3 --build-from-source
+  args:
+    chdir: "{{ ghost_install_dir }}"
+    creates: "{{ ghost_install_dir }}/node_modules/sqlite3/sqlite3.js"
+  become: true
+  become_user: ghost
+
+- name: Install Ghost
+  npm:
+    path: "{{ ghost_install_dir }}"
+    production: true
+  become: true
+  become_user: ghost
+
+- name: Create Ghost service definition
+  template:
+    dest: /etc/systemd/system/ghost.service
+    src: ghost.service.j2
+  notify:
+    - Restart Ghost
+    - Enable Ghost

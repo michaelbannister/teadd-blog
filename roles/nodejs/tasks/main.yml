@@ -2,14 +2,11 @@
 - name: Install the 'Development tools' package group
   yum: name="@development tools" state=installed
 
-- name: set up NodeSource repo
+- name: Set up NodeSource repo
   script: setup_node_4.x.sh creates=/etc/yum.repos.d/nodesource-el.repo
-    
-- name: install NodeJS
+
+- name: Install NodeJS
   yum: name=nodejs-4.4.7 state=installed
 
-- name: install node-gyp globally
+- name: Install node-gyp globally
   npm: name=node-gyp state=present global=true
-
-#- name: upgrade NPM
-#  npm: name=npm state=latest global=true

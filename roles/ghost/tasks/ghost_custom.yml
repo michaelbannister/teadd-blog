@@ -1,0 +1,8 @@
+- name: Download themes
+  git:
+    repo: https://github.com/michaelbannister/odin.git
+    dest: "{{ ghost_install_dir }}/content/themes/odin"
+    version: master
+  become: true
+  become_user: ghost
+  notify: Restart Ghost

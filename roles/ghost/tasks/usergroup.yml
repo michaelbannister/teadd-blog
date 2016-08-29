@@ -1,0 +1,19 @@
+- name: Create ghost group
+  group: name=ghost system=true
+
+- name: Create ghost home folder
+  file:
+    state: directory
+    path: "{{ ghost_install_dir }}"
+    mode: 0755
+
+- name: Create ghost user
+  user: name=ghost group=ghost system=true home="{{ ghost_install_dir }}"
+
+- name: Fix ghost home folder permissions
+  file:
+    state: directory
+    path: "{{ ghost_install_dir }}"
+    owner: ghost
+    group: ghost
+    mode: 0755

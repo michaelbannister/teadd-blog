@@ -6,13 +6,18 @@
 - name: Check if a device is already defined as swap
   command: blkid -l -t TYPE=swap -o device
   register: blkid_result
+  changed_when: false
 
-- command: mkswap {{ device }}
+- name: Make swap partion on {{ device }}
+  command: mkswap {{ device }}
   when: blkid_result.rc != 0
 
-- command: swapon {{ device }}
-- mount:
+- name: Add swap device to fstab
+  mount:
     state: present
     src: "{{ device }}"
     name: none
     fstype: swap
+
+- name: Enable swap
+  command: swapon -a

@@ -1,0 +1,5 @@
+- name: Ensure packages installed
+  yum: name="{{ item }}" state=installed
+  with_items:
+  - unzip
+  - git

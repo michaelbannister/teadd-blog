@@ -1,0 +1,18 @@
+# from https://github.com/TryGhost/Ghost-Config/blob/master/systemd/ghost.service
+
+[Unit]
+Description=ghost
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory={{ ghost_install_dir }}
+User=ghost
+Group=ghost
+ExecStart=/usr/bin/npm start --production
+ExecStop=/usr/bin/npm stop --production
+Restart=always
+SyslogIdentifier=Ghost
+
+[Install]
+WantedBy=multi-user.target
