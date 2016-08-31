@@ -5,6 +5,7 @@
 
 - name: Check if a device is already defined as swap
   command: blkid -l -t TYPE=swap -o device
+  ignore_errors: true
   register: blkid_result
   changed_when: false
 

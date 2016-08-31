@@ -2,4 +2,55 @@
   template:
     src: nginx.ghost.conf.j2
     dest: /etc/nginx/conf.d/ghost.conf
-  notify: Reload nginx
+
+- name: Allow nginx to read {{ ghost_install_dir }}
+  sefcontext:
+    target: "ghost_install_dir(/.*)?"
+    setype: httpd_sys_content_t
+
+- name: Force ngnix to reload now
+  service: name=nginx state=reloaded
+
+- name: Create directory for LetsEncrypt stuff
+  file:
+    state: directory
+    path: /etc/letsencrypt
+    mode: 0700
+
+- name: Generate LetsEncrypt account key
+  command: openssl genrsa -out /etc/letsencrypt/account.key 4096
+  args:
+    creates: /etc/letsencrypt/account.key
+
+- name: Generate SSL certificate and certificate signing request
+  command: openssl req -new -newkey rsa:2048 -keyout /etc/letsencrypt/{{ domain }}.key -nodes -out /etc/letsencrypt/{{ domain }}.csr -subj "/C=GB/ST=/L=London/O=TeaDD/OU=TeaDD/CN={{ domain }}"
+  args:
+    creates: /etc/letsencrypt/{{ domain }}.csr
+
+- letsencrypt:
+    account_key: /etc/letsencrypt/account.key
+    csr: "/etc/letsencrypt/{{ domain }}.csr"
+    dest: "/etc/letsencrypt/{{ domain }}.crt"
+  register: challenge
+- debug: var=challenge
+
+- file:
+    state: directory
+    path: "{{ ghost_install_dir }/{{ challenge['challenge_data'][domain]['http-01']['resource'] | dirname}}"
+    owner: ghost
+    group: ghost
+
+- copy:
+    dest: /var/www/ghost/{{ challenge['challenge_data'][domain]['http-01']['resource'] }}
+    content: "{{ challenge['challenge_data'][domain]['http-01']['resource_value'] }}"
+    owner: ghost
+    group: ghost
+  when: challenge|changed
+
+- letsencrypt:
+    account_key: /etc/letsencrypt/account.key
+    csr: "/etc/letsencrypt/{{ domain }}.csr"
+    dest: "/etc/letsencrypt/{{ domain }}.crt"
+    data: "{{ challenge }}"
+  register: response
+- debug: var=response

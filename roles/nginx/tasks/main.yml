@@ -11,6 +11,8 @@
 - name: Remove default server config
   file: state=absent path=/etc/nginx/conf.d/default.conf
 
+- name: Install libsemanage-python to be able to run seboolean module
+  yum: name=libsemanage-python state=installed
 
 - name: Set SELinux httpd flags
   seboolean: name={{ item }} state=yes persistent=yes

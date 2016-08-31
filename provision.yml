@@ -67,7 +67,7 @@
       name: default
       fwname: mb-ghost-app-http
       allowed: tcp:80,443
-      src_range: 80.229.171.237
+      src_range: 0.0.0.0/0
       target_tags: ansible-managed
       service_account_email: "{{ service_account_email }}"
       credentials_file: "{{ credentials_file }}"

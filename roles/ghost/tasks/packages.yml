@@ -3,3 +3,5 @@
   with_items:
   - unzip
   - git
+  - libselinux-python
+  - policycoreutils-python
