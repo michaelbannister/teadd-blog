@@ -31,9 +31,9 @@
     account_key: /etc/letsencrypt/account.key
     csr: "/etc/letsencrypt/{{ domain }}.csr"
     dest: "/etc/letsencrypt/{{ domain }}.crt"
-    acme_directory: https://acme-v01.api.letsencrypt.org
+    acme_directory: https://acme-v01.api.letsencrypt.org/directory
   register: challenge
-- debug: var=challenge
+- debug: var=challenge verbosity=1
 
 - file:
     state: directory
@@ -54,6 +54,6 @@
     csr: "/etc/letsencrypt/{{ domain }}.csr"
     dest: "/etc/letsencrypt/{{ domain }}.crt"
     data: "{{ challenge }}"
-    acme_directory: https://acme-v01.api.letsencrypt.org
+    acme_directory: https://acme-v01.api.letsencrypt.org/directory
   register: response
-- debug: var=response
+- debug: var=response verbosity=1
