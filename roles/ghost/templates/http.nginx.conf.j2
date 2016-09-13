@@ -1,0 +1,12 @@
+server {
+  listen 80;
+  server_name {{ domain }};
+
+  location /.well-known/ {
+    root {{ ghost_install_dir }};
+  }
+
+  location / {
+    return 301 https://$host$request_uri;
+  }
+}

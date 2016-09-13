@@ -1,12 +1,12 @@
-- name: Install nginx config
-  template:
-    src: nginx.ghost.conf.j2
-    dest: /etc/nginx/conf.d/ghost.conf
-
 - name: Allow nginx to read {{ ghost_install_dir }}
   sefcontext:
     target: "ghost_install_dir(/.*)?"
     setype: httpd_sys_content_t
+
+- name: Install nginx http server config
+  template:
+    src: http.nginx.conf.j2
+    dest: /etc/nginx/conf.d/http.conf
 
 - name: Force ngnix to reload now
   service: name=nginx state=reloaded
@@ -57,3 +57,16 @@
     acme_directory: https://acme-v01.api.letsencrypt.org/directory
   register: response
 - debug: var=response verbosity=1
+
+- name: Generate Strong Diffie-Hellman Group
+  command: openssl dhparam -out /etc/letsencrypt/dhparam.pem 2048
+  args:
+    creates: /etc/letsencrypt/dhparam.pem
+
+- name: Install nginx ssl server config
+  template:
+    src: https.nginx.conf.j2
+    dest: /etc/nginx/conf.d/https.conf
+
+- name: Force ngnix to reload again
+  service: name=nginx state=reloaded
