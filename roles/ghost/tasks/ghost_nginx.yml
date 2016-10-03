@@ -1,6 +1,6 @@
 - name: Allow nginx to read {{ ghost_install_dir }}
   sefcontext:
-    target: "ghost_install_dir(/.*)?"
+    target: "{{ ghost_install_dir }}(/.*)?"
     setype: httpd_sys_content_t
 
 - name: Install nginx http server config
