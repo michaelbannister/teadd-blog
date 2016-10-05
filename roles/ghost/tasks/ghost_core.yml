@@ -27,6 +27,8 @@
   template:
     src: config.js.j2
     dest: "{{ ghost_install_dir }}/config.js"
+  notify:
+    - Restart Ghost
 
 - name: Create Ghost service definition
   template:

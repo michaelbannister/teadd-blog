@@ -1,67 +1,29 @@
-- name: Allow nginx to read {{ ghost_install_dir }}
-  sefcontext:
-    target: "{{ ghost_install_dir }}(/.*)?"
-    setype: httpd_sys_content_t
-
-- name: Install nginx http server config
-  template:
-    src: http.nginx.conf.j2
-    dest: /etc/nginx/conf.d/http.conf
-
-- name: Force ngnix to reload now
-  service: name=nginx state=reloaded
-
 - name: Create directory for LetsEncrypt stuff
   file:
     state: directory
     path: /etc/letsencrypt
     mode: 0700
 
-- name: Generate LetsEncrypt account key
-  command: openssl genrsa -out /etc/letsencrypt/account.key 4096
-  args:
-    creates: /etc/letsencrypt/account.key
+- name: define certbot config file
+  template:
+    src: cli.ini.j2
+    dest: /etc/letsencrypt/cli.ini
 
-- name: Generate SSL certificate and certificate signing request
-  command: openssl req -new -newkey rsa:2048 -keyout /etc/letsencrypt/{{ domain }}.key -nodes -out /etc/letsencrypt/{{ domain }}.csr -subj "/C=GB/ST=/L=London/O=TeaDD/OU=TeaDD/CN={{ domain }}"
-  args:
-    creates: /etc/letsencrypt/{{ domain }}.csr
+- name: Install nginx http server config
+  template:
+    src: http.nginx.conf.j2
+    dest: /etc/nginx/conf.d/http.conf
 
-- letsencrypt:
-    account_key: /etc/letsencrypt/account.key
-    csr: "/etc/letsencrypt/{{ domain }}.csr"
-    dest: "/etc/letsencrypt/{{ domain }}.crt"
-    acme_directory: https://acme-v01.api.letsencrypt.org/directory
-  register: challenge
-- debug: var=challenge verbosity=1
+- name: Force nginx to reload now
+  service: name=nginx state=reloaded
 
-- file:
-    state: directory
-    path: "{{ ghost_install_dir }}/{{ challenge['challenge_data'][domain]['http-01']['resource'] | dirname}}"
-    owner: ghost
-    group: ghost
-  when: challenge|changed
-
-- copy:
-    dest: /var/www/ghost/{{ challenge['challenge_data'][domain]['http-01']['resource'] }}
-    content: "{{ challenge['challenge_data'][domain]['http-01']['resource_value'] }}"
-    owner: ghost
-    group: ghost
-  when: challenge|changed
-
-- letsencrypt:
-    account_key: /etc/letsencrypt/account.key
-    csr: "/etc/letsencrypt/{{ domain }}.csr"
-    dest: "/etc/letsencrypt/{{ domain }}.crt"
-    data: "{{ challenge }}"
-    acme_directory: https://acme-v01.api.letsencrypt.org/directory
-  register: response
-- debug: var=response verbosity=1
+- name: run certbot
+  command: /usr/bin/certbot certonly --noninteractive
 
 - name: Generate Strong Diffie-Hellman Group
-  command: openssl dhparam -out /etc/letsencrypt/dhparam.pem 2048
+  command: openssl dhparam -out /etc/ssl/dhparam.pem 2048
   args:
-    creates: /etc/letsencrypt/dhparam.pem
+    creates: /etc/ssl/dhparam.pem
 
 - name: Install nginx ssl server config
   template:
@@ -70,3 +32,9 @@
 
 - name: Force ngnix to reload again
   service: name=nginx state=reloaded
+
+- name: configure automatic certificate renewal
+  cron:
+    name: certbot
+    job: certbot renew --noninteractive
+    hour: 3,15

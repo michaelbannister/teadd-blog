@@ -6,6 +6,7 @@
     state: directory
     path: "{{ ghost_install_dir }}"
     mode: 0755
+    setype: httpd_sys_content_t
 
 - name: Create ghost user
   user: name=ghost group=ghost system=true home="{{ ghost_install_dir }}"

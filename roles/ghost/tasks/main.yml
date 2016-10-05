@@ -1,5 +1,5 @@
 - include: packages.yml
 - include: usergroup.yml
-- include: ghost_core.yml
 - include: ghost_nginx.yml
+- include: ghost_core.yml
 - include: ghost_custom.yml

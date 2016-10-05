@@ -1,3 +1,6 @@
+- name: Install EPEL repo
+  yum: name="epel-release" state=installed
+
 - name: Ensure packages installed
   yum: name="{{ item }}" state=installed
   with_items:
@@ -5,3 +8,4 @@
   - git
   - libselinux-python
   - policycoreutils-python
+  - certbot
